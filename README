@@ -1,0 +1,48 @@
+Net::Gopher::Response::XML, version 0.77 (BATA).
+===============================================================================
+
+
+INTRODUCTION
+
+
+Net::Gopher::Response::XML contains an additional Net::Gopher::Response  method
+you can use to generate XML from for Gopher and Gopher+ responses.
+
+Net::Gopher::Response::XML once shipped with Net::Gopher, but as of Net::Gopher
+1.05,   it   no   longer   does.   See   the   DESCRIPTION   section   in   the
+Net::Gopher::Response::XML for more.
+
+
+INSTALLATION
+
+
+Install Net::Gopher::Response::XML as you would most other modules:
+ $ perl Makefile.PL
+ $ make
+ $ make test
+ $ make install
+
+You can also use Module::Build instead of GNU Make:
+ $ perl Build.PL
+ $ perl Build
+ $ perl Build test
+ $ perl Build install
+
+
+PREREQUISITES
+
+
+Net::Gopher::Response::XML requires these modules:
+ Net::Gopher (at least version 0.90);
+ IO::String (at least version 1.0);
+ XML::Writer (at least version 0.4);
+
+
+COPYRIGHT AND LICENSE
+
+
+Copyright 2004 by William G. Davis.
+
+This code is free software released under the GNU General Public  License,  the
+full terms of which can be found in the "COPYING" file in this directory.
+

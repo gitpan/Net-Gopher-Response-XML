@@ -1,0 +1,9 @@
+Build.PL
+COPYING
+Changes
+MANIFEST
+Makefile.PL
+README
+examples/newservers.pl
+lib/Net/Gopher/Response/XML.pm
+test.pl
