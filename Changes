@@ -1,2 +1,4 @@
 Revision history for Perl extension Net::Gopher::Response::XML.
 
+0.90 - Added 40 or so new tests, and updated as_xml() to work better with newer
+       versions of Net::Gopher.

@@ -25,6 +25,6 @@ my $response = $ng->gopher(
 die "Couldn't get list of new servers: " . $response->error
 	if ($response->is_error);
 
-$response->as_xml(File => './newservers/newservers.xml');
+$response->as_xml(File => 'newservers.xml');
 
-print "\n...Saved to ./newservers/newservers.xml\n";
+print "\n...Saved to newservers.xml\n";

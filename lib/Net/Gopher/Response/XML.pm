@@ -44,9 +44,9 @@ use IO::String;
 use XML::Writer;
 use Net::Gopher::Constants qw(:request :item_types);
 use Net::Gopher::Exception;
-use Net::Gopher::Utility  qw(check_params %ITEM_DESCRIPTIONS);
+use Net::Gopher::Utility  qw(get_named_params %ITEM_DESCRIPTIONS);
 
-$VERSION = '0.77';
+$VERSION = '0.90';
 
 push(@ISA, 'Net::Gopher::Exception');
 
@@ -81,7 +81,7 @@ add indentation. By default, pretty is true.
 =item Declaration
 
 The I<Declaration> parameter tells the method whether or not it should generate
-an XML C<E<lt>?xml ...?E<gt> declaration at the beginning of the generated XML.
+an XML E<lt>?xml ...?E<gt> declaration at the beginning of the generated XML.
 By default, this is true.
 
 =back
@@ -95,20 +95,32 @@ sub Net::Gopher::Response::as_xml
 {
 	my $self = shift;
 
-	$self->call_warn(
-		sprintf("You sent a %s request for a %s item. The response " .
-		        "shouldn't contain text and shouldn't be " .
-			"convertable to XML.",
-			$self->request->request_type == GOPHER_PLUS_REQUEST
-				? 'Gopher+'
-				: 'Gopher',
-			$ITEM_DESCRIPTIONS{$self->request->item_type}
-		)
-	) unless ($self->is_text
-		or !exists $ITEM_DESCRIPTIONS{$self->request->item_type});
+	my $request_type = $self->request->request_type;
+	my $item_type    = $self->request->item_type;
 
-	my ($filename, $pretty, $declaration) =
-		check_params(['File', 'Pretty', 'Declaration'], \@_);
+	if ($request_type != ITEM_ATTRIBUTE_REQUEST
+		or $request_type != DIRECTORY_ATTRIBUTE_REQUEST)
+	{
+		$self->call_warn(
+			sprintf("You sent a %s request for a %s item. The " .
+			        "response shouldn't contain text and you " .
+			        "shouldn't be able to convert it to XML.",
+				$request_type == GOPHER_PLUS_REQUEST
+					? 'Gopher+'
+					: 'Gopher',
+				$ITEM_DESCRIPTIONS{$item_type}
+			)
+		) unless ($self->is_text
+			or !exists $ITEM_DESCRIPTIONS{$item_type});
+	}
+
+	my ($filename, $pretty, $declaration);
+	get_named_params({
+		File        => \$filename,
+		Pretty      => \$pretty,
+		Declaration => \$declaration
+		}, \@_
+	);
 
 	# default to on if either was not supplied:
 	$pretty      = (defined $pretty) ? $pretty : 1;
@@ -148,14 +160,14 @@ sub Net::Gopher::Response::as_xml
 
 	$writer->xmlDecl('UTF-8') if ($declaration);
 
-	if (($self->request->request_type == ITEM_ATTRIBUTE_REQUEST
-		or $self->request->request_type == DIRECTORY_ATTRIBUTE_REQUEST)
+	if (($request_type == ITEM_ATTRIBUTE_REQUEST
+		or $request_type == DIRECTORY_ATTRIBUTE_REQUEST)
 			and $self->is_blocks)
 	{
 		gen_block_xml($self, $writer);
 	}
-	elsif (($self->request->item_type eq GOPHER_MENU_TYPE
-		or $self->request->item_type eq INDEX_SEARCH_SERVER_TYPE)
+	elsif (($item_type eq GOPHER_MENU_TYPE
+		or $item_type eq INDEX_SEARCH_SERVER_TYPE)
 			and $self->is_menu)
 	{
 		gen_menu_xml($self, $writer);
@@ -261,7 +273,7 @@ sub gen_block_xml
 			{
 				my ($type, $display, $selector,
 				    $host, $port, $gopher_plus) =
-						$block->extract_description;
+						$block->extract_descriptor;
 
 				$writer->dataElement('item-type', $type);
 				$writer->dataElement(
@@ -300,11 +312,11 @@ sub gen_block_xml
 			{
 				my %attributes = $block->get_attributes;
 
-				while (my ($name, $value) = each %attributes)
+				foreach my $key (sort keys %attributes)
 				{
 					$writer->dataElement(
-						'attribute',
-						$value, name => $name
+						attribute => $attributes{$key},
+						name      => $key
 					);
 				}
 			}

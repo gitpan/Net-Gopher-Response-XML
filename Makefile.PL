@@ -7,7 +7,7 @@ WriteMakefile(
 	VERSION_FROM    => 'lib/Net/Gopher/Response/XML.pm',
 	PL_FILES        => {},
 	PREREQ_PM       => {
-		'Net::Gopher' => 0.90,
+		'Net::Gopher' => 1.12,
 		'IO::String'  => 1.00,
 		'XML::Writer' => 0.40,
 	},
